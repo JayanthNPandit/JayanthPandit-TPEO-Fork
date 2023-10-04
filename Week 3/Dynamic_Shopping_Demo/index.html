@@ -13,13 +13,36 @@
       <div>
           <label for="item">Enter a new item:</label>
           <input type="text" name="item" id="item">
-          <button>Add item</button>
+          <button onClick="createListItem()">Add item</button>
       </div>
 
       <ul id="Shopping-List"></ul>
     </div>
 
     <script>
+
+      let shoppingList = localStorage.getItem("shoppingList")
+
+      if (!shoppingList)
+      {
+        shoppingList = [];
+      } else
+      {
+        shoppingList.forEach(item => {
+          addItem(item);
+        });
+      }
+
+      function createListItem()
+      {
+        console.log("Button clicked!");
+        const item = document.querySelector("#item");
+        console.log(item);
+
+        addItem(item.value);
+        item.value = "";
+        item.focus();
+      }
 
       //conveniently done for you!
       function addItem(text) {
@@ -40,6 +63,37 @@
         li.appendChild(deleteButton);
         li.appendChild(saveButton);
         
+        deleteButton.addEventListener("click", () => {
+          list.removeChild(li)
+          console.log("Delete button clicked!");
+          const item = document.querySelector("#item");
+          console.log(item);
+          shoppingList = shoppingList.filter(item => item != span.innerText);          
+          localStorage.setItem("shoppingList", JSON.stringify(shoppingList));
+        });
+        saveButton.addEventListener("click", () => {
+          console.log("Save button clicked!");
+
+          const itemExists = shoppingList.some((item => item == text)); // check if item exists in list
+
+          if (!itemExists)
+          {
+            shoppingList = shoppingList.filter(item => item != span.innerText); // remove item from list
+          }
+          // pull localStorage into list
+          // update list
+          shoppingList.push(text);
+          // set localStorage
+          localStorage.setItem("shoppingList", JSON.stringify(shoppingList));
+        });
+      }
+
+      function saveItem()
+      {
+        console.log("Save button clicked!");
+        const item = document.querySelector("#item");
+        console.log(item);
+        saveItem(item.value);
       }
 
     </script>
