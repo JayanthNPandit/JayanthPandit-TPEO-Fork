@@ -89,7 +89,7 @@
 		function fetchWeatherData()
 		{
 			// creates the API call with the value from the search input as a query
-			let apiCall = `https://api.openweathermap.org/data/2.5/onecall?lat=${city.lat}&lon=${city.lon}&appid=${apiKey}&units=imperial`;
+			let apiCall = `https://api.openweathermap.org/data/2.5/onecall?lat=${city.lat}&lon=${city.lon}&exclude=hourly,daily&appid=${apiKey}&units=imperial`;
 			// calls the API
 			fetch(apiCall)
 				.then((response) => 
@@ -98,8 +98,29 @@
 				)
 				.then((data) => {
 					// after recieving the converted JSON data, pass the JSON to the renderSearchResults() function
+					const currentWeather = data.current;
+
+					weather = {
+						temp: currentWeather.temp,
+						description: currentWeather.weather[0].description,
+						feelsLike: currentWeather.feels_like,
+						humidity: currentWeather.humidity,
+						windSpeed: currentWeather.wind_speed
+					};
 					renderWeatherData(data)
-				});
+
+				// Print the weather data for today in the weather container using the data fetched from the API call
+				document.querySelector('#weather-container').innerHTML = `
+					<h2>${weather.temp}°F</h2>
+					<h3>${weather.description}</h3>
+					<h3>Feels like ${weather.feelsLike}°F</h3>
+					<h3>Humidity: ${weather.humidity}%</h3>
+					<h3>Wind: ${weather.windSpeed} mph</h3>
+				`;
+			})
+			.catch(error => {
+				console.error('Error:', error)
+			});
 		}
 
 		// function that is called whenever a city has been selected
@@ -114,16 +135,6 @@
 				state: state,
 				lat: lat,
 				lon: lon
-			}
-
-			// How do I get access to the weather data that we fetched from the api call back in search()?
-
-			weather = {
-				temp: weather.temp,
-				description: weather.description,
-				feelsLike: weather.feelsLike,
-				humidity: weather.humidity,
-				windSpeed: weather.windSpeed
 			}
 
 			//printing the city object to the console
@@ -142,14 +153,7 @@
 				<h3>${city.lat}, ${city.lon}</h3>
 			`*/
 
-			// Print the weather data for today in the weather container using the data fetched from the API call
-			document.querySelector('#weather-container').innerHTML = `
-				<h2>${weather.temp}°F</h2>
-				<h3>${weather.description}</h3>
-				<h3>Feels like ${weather.feelsLike}°F</h3>
-				<h3>Humidity: ${weather.humidity}%</h3>
-				<h3>Wind: ${weather.windSpeed} mph</h3>
-			`
+			fetchWeatherData();
 		}
 	</script>
 </html>
