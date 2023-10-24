@@ -18,6 +18,13 @@ import { useAuth } from '../contexts/AuthContext'
 export default function HomePage() {
   const navigate = useNavigate();
 
+  const { currentUser } = useAuth();
+
+  useEffect(() => {
+    if (!currentUser) {
+      navigate('/login');
+    }
+  }, [currentUser]);
 
   // State to hold the list of tasks.
   const [tasks, setTasks] = useState([
@@ -32,37 +39,63 @@ export default function HomePage() {
   // State for the task name being entered by the user.
   const [taskName, setTaskName] = useState("");
 
+  useEffect(() => {
+    axios.get("https://tpeo-todo.vercel.app/tasks")
+      .then((response) => {
+        setTasks(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching task:", error);
+      });
+  }, []);
+
   // TODO: Support retrieving your todo list from the API.
   // Currently, the tasks are hardcoded. You'll need to make an API call
   // to fetch the list of tasks instead of using the hardcoded data.
 
-  function addTask() {
-    // Check if task name is provided and if it doesn't already exist.
-    if (taskName && !tasks.some((task) => task.name === taskName)) {
+  // TODO: Support adding todo items to your todo list through the API.
+    // In addition to updating the state directly, you should send a request
+    // to the API to add a new task and then update the state based on the response.
 
-      // TODO: Support adding todo items to your todo list through the API.
-      // In addition to updating the state directly, you should send a request
-      // to the API to add a new task and then update the state based on the response.
-
-      setTasks([...tasks, { name: taskName, finished: false }]);
-      setTaskName("");
-    } else if (tasks.some((task) => task.name === taskName)) {
-      alert("Task already exists!");
+    function addTask() {
+      if (taskName && !tasks.some((task) => task.name === taskName)) {
+        axios.post("https://tpeo-todo.vercel.app/tasks", { name: taskName, finished: false })
+          .then((response) => {
+            setTasks([...tasks, response.data]); // Update the state with the response data
+            setTaskName("");
+          })
+          .catch((error) => {
+            console.error("Error adding a task:", error);
+          });
+      } else if (tasks.some((task) => task.name === taskName)) {
+        alert("Task exists");
+      }
     }
-  }
+    
+  // TODO: Support removing/checking off todo items in your todo list through the API.
+  // Similar to adding tasks, when checking off a task, you should send a request
+  // to the API to update the task's status and then update the state based on the response.
 
   // Function to toggle the 'finished' status of a task.
   function updateTask(name) {
-    setTasks(
-      tasks.map((task) =>
-        task.name === name ? { ...task, finished: !task.finished } : task
-      )
-    );
+  const updatedTasks = tasks.map((task) => {
+    if (task.name === name) {
+      const updatedTask = { ...task, finished: !task.finished };
+      axios.put(`https://tpeo-todo.vercel.app/tasks/${task.id}`, updatedTask)
+        .then((response) => {
+          // Handle the response if needed
+          setTasks(response.data); // Update the state with the response data
+        })
+        .catch((error) => {
+          console.error("Error updating a task:", error);
+        });
+      return updatedTask;
+    }
+    return task;
+  });
+  setTasks(updatedTasks);
+}
 
-    // TODO: Support removing/checking off todo items in your todo list through the API.
-    // Similar to adding tasks, when checking off a task, you should send a request
-    // to the API to update the task's status and then update the state based on the response.
-  }
 
   // Function to compute a message indicating how many tasks are unfinished.
   function getSummary() {

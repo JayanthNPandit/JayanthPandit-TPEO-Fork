@@ -8,6 +8,7 @@ import {
   Alert,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+import { useAuth } from "../contexts/AuthContext";
 //import { useAuth } from "../contexts/AuthContext";
 
 function LoginPage() {
@@ -16,6 +17,7 @@ function LoginPage() {
 
   // TODO: Extract login function and error from our authentication context.
 
+  const [loginError, login] = useAuth();
 
   // State to hold the username and password entered by the user.
   const [username, setUsername] = useState("");
@@ -23,7 +25,9 @@ function LoginPage() {
 
   // TODO: Handle login function.
   const handleLogin = () => {
-    
+    login(username, password);
+
+
   };
 
 
@@ -89,6 +93,11 @@ function LoginPage() {
           </Button>
         </Box>
         {/* TODO: Display Login Error if it exists */}
+        {loginError && (
+        <Alert severity="error" sx={{ mt: 2}}>
+          {loginError}
+        </Alert>  
+        ) }
       </Box>
     </Container>
   );
