@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "firebase": "^10.5.1",
+    "package.json": "^2.0.1"
+  }
+}
