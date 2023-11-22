@@ -17,7 +17,7 @@ function LoginPage() {
 
   // TODO: Extract login function and error from our authentication context.
 
-  const [loginError, login] = useAuth();
+  const [loginError, login] = useAuth()
 
   // State to hold the username and password entered by the user.
   const [username, setUsername] = useState("");
@@ -26,8 +26,6 @@ function LoginPage() {
   // TODO: Handle login function.
   const handleLogin = () => {
     login(username, password);
-
-
   };
 
 

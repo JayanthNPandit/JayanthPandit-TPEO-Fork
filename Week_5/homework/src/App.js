@@ -1,4 +1,4 @@
-import { AuthProvider } from "./contexts/AuthContext";
+// import { AuthProvider } from "./contexts/AuthContext";
 import { CssBaseline } from "@mui/material";
 import theme from "./Theme";
 
@@ -9,8 +9,8 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { AuthProvider } from "./contexts/AuthContext"; // Custom context for authentication
 import HomePage from "./components/HomePage"; // Component for the homepage
 import LoginPage from "./components/LoginPage"; // Component for the login page
-import { CssBaseline } from "@mui/material"; // For consistent baseline styling
-import theme from "./Theme"; // Custom theme settings
+// import { CssBaseline } from "@mui/material"; // For consistent baseline styling
+// import theme from "./Theme"; // Custom theme settings
 
 // The main App component
 function App() {
@@ -20,7 +20,7 @@ function App() {
       {/* CssBaseline is a component from MUI. It helps in providing consistent baseline styling across different browsers. */}
       <CssBaseline/>
       {/* TODO: AuthProvider is a custom context component that provides authentication functionalities to its children. */}
-      <AuthProvider
+      <AuthProvider>
         {/* ThemeProvider from MUI provides theming capabilities. We pass our custom theme to it. */}
         <ThemeProvider theme={theme}>
           {/* Routes is a component from react-router-dom that wraps all possible routes or pages */}

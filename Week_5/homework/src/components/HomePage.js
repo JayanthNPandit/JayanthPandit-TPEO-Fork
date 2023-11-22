@@ -14,6 +14,7 @@ import {
 import Header from "./Header";
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext'
+import axios from "axios";
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -57,18 +58,45 @@ export default function HomePage() {
     // In addition to updating the state directly, you should send a request
     // to the API to add a new task and then update the state based on the response.
 
+    function getTasks(user) {
+      fetch(`https://tpeo-todo.vercel.app/tasks/${user}`)
+      .then((response) => response.json())
+      .then((data) => {
+        // data = data.filter((item) => item.finished);
+        const mappedData = data.map((item) => {
+          return {id: item.id, name : item.task, finished: item.finished};
+        })
+        setTasks(mappedData);
+      });
+    }
+
+
     function addTask() {
+      // Check if task name already exists
       if (taskName && !tasks.some((task) => task.name === taskName)) {
-        axios.post("https://tpeo-todo.vercel.app/tasks", { name: taskName, finished: false })
-          .then((response) => {
-            setTasks([...tasks, response.data]); // Update the state with the response data
-            setTaskName("");
-          })
-          .catch((error) => {
-            console.error("Error adding a task:", error);
+  
+        // TODO: Support adding todo items to your todo list through the API.
+        // In addition to updating the state directly, you should send a request
+        // to the API to add a new task and then update the state based on the response.
+        fetch("https://tpeo-todo.vercel.app/tasks", {
+          method: "POST",
+          headers : {
+            "Content-Type": "application/json",
+            "accept": "application/json",
+          },
+          body: JSON.stringify({
+            "user": "Jayanth",
+            "task": taskName,
+            "finished": false
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            setTasks([...tasks, { name: taskName, finished: false, id: data.id }]); 
           });
+        setTaskName("");
       } else if (tasks.some((task) => task.name === taskName)) {
-        alert("Task exists");
+        alert("Task already exists!");
       }
     }
     
@@ -78,6 +106,15 @@ export default function HomePage() {
 
   // Function to toggle the 'finished' status of a task.
   function updateTask(name) {
+    setTasks(
+      tasks.map((task) =>
+        task.name === name ? { ...task, finished: !task.finished } : task
+      )
+    ); // fixed it finally
+    }
+
+
+  /*function updateTask(name) {
   const updatedTasks = tasks.map((task) => {
     if (task.name === name) {
       const updatedTask = { ...task, finished: !task.finished };
@@ -94,8 +131,13 @@ export default function HomePage() {
     return task;
   });
   setTasks(updatedTasks);
-}
+}*/
 
+  // remove all the tasks that are finished
+  function removeFinishedTasks() {
+    const unfinishedTasks = tasks.filter((task) => !task.finished);
+    setTasks(unfinishedTasks);
+  }
 
   // Function to compute a message indicating how many tasks are unfinished.
   function getSummary() {

@@ -10,7 +10,20 @@
 <body>
 	<div id='main-container'>
 		<div id='weather-container'>
-		</div> 
+			<div id = 'current-container'>
+				<h2>Current Weather</h2>
+				<h3 id = 'current-date' class = 'date'></h3>
+				<h1 id = 'city'></h1>
+				<div id = 'conditions'>
+					<h2 id = 'temp'></h2>
+					<h3 id = 'description'></h3>
+					<h3 id = 'feels-like'></h3>
+					<h3 id = 'humidity'></h3>
+					<h3 id = 'wind'></h3>
+				</div>
+			</div> 
+			<div id = 'five-day-cards-container'></div>
+		</div>
 	</div>
 	<div id='side-container'>
 		<div>
@@ -137,24 +150,78 @@
 				lon: lon
 			}
 
-			//printing the city object to the console
-			console.log(city);
-            // BEGIN CODING HERE
-			console.log(city.fullName);
-			console.log(city.name);
-			console.log(city.state);
-			console.log(city.lat);
-			console.log(city.lon);
-
-			// Print the city data in the main container
-			/*document.querySelector('#main-container').innerHTML = `
-				<h1>${city.fullName}</h1>
-				<h2>${city.name}, ${city.state}</h2>
-				<h3>${city.lat}, ${city.lon}</h3>
-			`*/
-
-			fetchWeatherData();
+			document.querySelector('#city').innerText = 'Weather for ' + city.fullName; 
+			getWeather()
+			getAQI()
 		}
+
+		function getWeather() {
+			let apiCall = `https://api.openweathermap.org/data/2.5/onecall?lat=${city.lat}&lon=${city.lon}&exclude=hourly,daily&appid=${apiKey}&units=imperial`;
+			fetch(apiCall)
+				.then((response) => 
+					response.json()
+				)
+				.then((data) => {
+					weather = data.current
+					renderWeatherData(data)
+				});
+		}
+
+		// gets the AQI info for a location
+		function getAQI() {
+		let apiCall = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${city.lat}&lon=${city.lon}&appid=${apiKey}`;
+		fetch(apiCall)
+			.then((response) => 
+				response.json()
+			)
+			.then((data) => {
+				// sets the global AQI variable
+				aqi = data.list[0]
+				renderAQI()
+			});
+		}
+
+		function renderAQI() {
+			document.querySelector('#aqi').innerText = 'AQI: ' + aqi.main.aqi;
+		}
+
+		function renderWeather() {
+			document.querySelector('#temp').innerText = Math.round(weather.current.temp) + "°"
+			document.querySelector('#weather').innerText = weather.current.weather[0].description
+			document.querySelector('#current-date').innerText = formatDate()
+			document.querySelector('#current-icon').src = `icons/${weather.current.weather[0].icon}.svg`
+			document.querySelector('#current-icon').alt = "weather-icon"
+			renderFiveDay()
+		}
+
+		function renderFiveDay() {
+			const fiveDayCardsContainer = document.querySelector('#five-day-cards-container')
+			fiveDayCardsContainer.innerHTML = ""
+
+			for (let i = 1; i < 6; i++) {
+				const card = document.createElement('div')
+
+				card.className = 'day-card'
+				const date = document.createElement('h3')
+				date.className = 'date'
+				date.innerHTML = formatDate(i)
+				card.appendChild(date)
+				const icon = document.createElement('img')
+				icon.className = 'icon'
+				icon.src = `icons/${weather.daily[i].weather[0].icon}.svg`
+
+				console.log(icon.src)
+				icon.alt = "weather-icon"
+				card.appendChild(icon)
+				const maxTemp = document.createElement('h3')
+				maxTemp.className = 'max-temp'
+				maxTemp.innerHTML = Math.round(weather.daily[i].temp.max) + "°"
+
+				card.appendChild
+				fiveDayCardsContainer.appendChild(card)
+			}
+		}
+
 	</script>
 </html>
 

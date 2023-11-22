@@ -8,6 +8,7 @@ const AuthContext = createContext();
 
 // This is a custom hook that we'll use to easily access our authentication context from other components.
 export const useAuth = () => {
+    // console.log(useContext(AuthContext))
     return useContext(AuthContext);
 };
 
@@ -20,7 +21,7 @@ export function AuthProvider({ children }) {
     const [loginError, setLoginError] = useState(null); // Error message to be displayed to the user
 
     const VALID_USERNAME = 'admin'; // Valid username
-    const_VALID_PASSWORD = 'fubar'; // Valid password
+    const VALID_PASSWORD = 'fubar'; // Valid password
 
     // Login function that validates the provided username and password.
     const login = (username, password) => {
